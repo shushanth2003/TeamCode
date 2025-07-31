@@ -34,7 +34,7 @@ const Home = () => {
             Welcome to <span className="text-indigo-600">TeamCode</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-700 font-medium text-center mb-8">
-            Collaborate, learn, and develop alongside top developers worldwide.<br />
+            Collaborate, learn, and develop alongside top developers worldwide.
             Discover partners, improve your skills, and create something <span className="text-blue-500 font-semibold">incredible</span> with a cooperative team on our platform.
           </p>
           <button
