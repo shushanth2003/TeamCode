@@ -21,7 +21,7 @@ const Home = () => {
               <Link to="/register" className="hover:text-indigo-700 transition duration-150">Register</Link>
             </li>
             <li>
-              <Link to="/contact" className="hover:text-indigo-700 transition duration-150">Contact</Link>
+              <Link to="/contact" className="hover:text-indigo-700 transition duration-150">Contact Us</Link>
             </li>
           </ul>
         </nav>
