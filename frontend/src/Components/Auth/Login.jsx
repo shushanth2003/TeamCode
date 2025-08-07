@@ -1,8 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import img from '../image/teamcodeloginimg.jpg';
 
 const Login = () => {
+  const [email,setEmail]=useState("");
+  const [password,setPassword]=useState("");
+  const [error,setError]=useState("");
+  const validate=()=>{
+    const emailregex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!email.test(emailregex)){
+      setError('Please enter the valid email address');
+      return false;
+    }
+    if(password.length<6){
+      setError("Password must be atleast 6 characters long.");
+      return false;
+    }
+    setError('');
+    return true;
+  }
+  const handleSubmit=async (e)=>{
+    e.preventDefault();
+    
+    try{
+      const response= await fetch('https://yourapi.com/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': 'YOUR_API_KEY' },
+      body: JSON.stringify({ email, password }),
+    });
+    const data=await response.json();
+    if(response.ok){
+      alert("Validated")
+    }else{
+      setError(data.message||'Login Failed')
+    }
+  }catch(err){
+    setError('network or server error')
+  }
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-100 to-blue-300 flex flex-col">
       {/* HEADER */}
@@ -43,7 +78,7 @@ const Login = () => {
           {/* Right - Login Form */}
           <div className="flex-1 flex flex-col justify-center px-8 py-12">
             <h2 className="text-3xl font-extrabold text-blue-800 text-center mb-4 tracking-tight">Sign In to <span className="text-indigo-600">TeamCode</span></h2>
-            <form className="flex flex-col gap-6">
+            <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="email" className="block text-sm font-semibold text-blue-800 mb-1">Email</label>
                 <input
@@ -52,6 +87,7 @@ const Login = () => {
                   placeholder="Enter your email"
                   className="w-full px-4 py-3 rounded-xl bg-sky-50 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 text-blue-900 font-medium transition"
                   autoComplete="email"
+                  onChange={e=>setEmail(e.target.value)}
                 />
               </div>
               <div>
@@ -62,6 +98,7 @@ const Login = () => {
                   placeholder="Enter your password"
                   className="w-full px-4 py-3 rounded-xl bg-sky-50 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 text-blue-900 font-medium transition"
                   autoComplete="current-password"
+                  onChange={e=>setPassword(e.target.value)}
                 />
               </div>
               <button
