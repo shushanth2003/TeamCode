@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.Loginrequest;
+import com.example.backend.model.Contact;
 import com.example.backend.model.User;
 import com.example.backend.service.Userservice;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,15 @@ public class Usercontroller {
     public ResponseEntity<String> registerUser(@RequestBody User user){
         String res=userservice.getRegister(user);
         if(res.equals("User Registered SuccessFully")){
+            return ResponseEntity.ok(res);
+        }else{
+            return ResponseEntity.badRequest().body(res);
+        }
+    }
+    @PostMapping("/contact")
+    public ResponseEntity<String> contactUser(@RequestBody Contact contact){
+        String res=userservice.getContacts(contact);
+        if(res.equals("Contacts Saved SuccessFully")){
             return ResponseEntity.ok(res);
         }else{
             return ResponseEntity.badRequest().body(res);

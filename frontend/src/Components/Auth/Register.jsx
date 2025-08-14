@@ -25,12 +25,10 @@ const Register = () => {
   const handleSubmit=async (e)=>{
     e.preventDefault();
     try{
-      const response=await fetch('https://yourapi.com/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': 'YOUR_API_KEY' },
-      body: JSON.stringify({fullname,email,password,phoneno,role})
-    }
-      )
+      const response=await axios.post('http://localhost:8080/api/register', 
+  { email, password },
+  { headers: { 'x-api-key': 'YOUR_API_KEY_HERE' } }
+);
       const data=await response.json();
       if(response.ok){
         alert("Validated")
