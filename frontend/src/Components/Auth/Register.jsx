@@ -1,53 +1,109 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import img from '../image/teamcodeloginimg.jpg';
 
 const Register = () => {
-  const [fullname,setFullname]=useState("");
-  const [email,setEmail]=useState("");
-  const [password,setPassword]=useState("");
-  const [phoneno,setPhoneno]=useState("");
-  const [role,setRole]=useState("");
-  const [error,setError]=useState("");
-  const validate=()=>{
-    const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if(!email.test(emailRegex)){
-      setError("Please Enter the Valid Email Address");
-      return false
-    }
-    if(password.length<6){
-      setError("Password must be atleast 6 characters")
+  const [fullname, setFullname] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [phoneno, setPhoneno] = useState('');
+  const [role, setRole] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const validate = () => {
+    if (!fullname.trim()) {
+      setError('Full Name is required');
+      setSuccess('');
       return false;
     }
-    setError(" ")
-    return true;
-  }
-  const handleSubmit=async (e)=>{
-    e.preventDefault();
-    try{
-      const response=await axios.post('http://localhost:8080/api/register', 
-  { email, password },
-  { headers: { 'x-api-key': 'YOUR_API_KEY_HERE' } }
-);
-      const data=await response.json();
-      if(response.ok){
-        alert("Validated")
-      }else{
-        setError(data.message||"Login Failed")
-      }
-    }catch(err){
-      setError("Network or server error")
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      setSuccess('');
+      return false;
     }
-  }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      setSuccess('');
+      return false;
+    }
+    if (!phoneno.trim() || phoneno.length < 7) {
+      setError('Please enter a valid phone number');
+      setSuccess('');
+      return false;
+    }
+    if (!role.trim()) {
+      setError('Role is required');
+      setSuccess('');
+      return false;
+    }
+    setError('');
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSuccess('');
+    if (!validate()) return;
+    try {
+      await axios.post(
+        'http://localhost:8080/api/register',
+        { fullname, email, password, phoneno, role },
+        { headers: { 'x-api-key': 'YOUR_API_KEY_HERE' } }
+      );
+      setError('');
+      setSuccess('Registration Successful! 🎉');
+      setTimeout(() => setSuccess(''), 2500);
+      setFullname('');
+      setEmail('');
+      setPassword('');
+      setPhoneno('');
+      setRole('');
+    } catch (err) {
+      setSuccess('');
+      if (err.response && err.response.data) {
+        setError(err.response.data.message || 'Registration Failed');
+      } else {
+        setError('Network or server error');
+      }
+    }
+  };
+
+  // Feedback box component
+  const FeedbackBox = ({ message, type }) => (
+    <div
+      className={`
+        flex items-center gap-2 max-w-xs mx-auto my-2 px-4 py-3 rounded-lg shadow-lg font-semibold
+        ${type === 'success'
+          ? 'bg-green-100 text-green-800 border border-green-300'
+          : 'bg-red-100 text-red-800 border border-red-300'}
+        animate-fade-in
+      `}
+      style={{ animation: 'fadeIn 0.3s' }}
+    >
+      {type === 'success' ? (
+        <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      ) : (
+        <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      )}
+      <span>{message}</span>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-100 to-blue-300 flex flex-col">
       {/* HEADER */}
       <header className="backdrop-blur-md bg-white/60 shadow-lg py-4 px-6 flex items-center justify-between">
-        {/* Logo/Title */}
         <div className="text-2xl lg:text-3xl font-extrabold text-blue-700 tracking-tight drop-shadow-md">
           Team<span className="text-indigo-600">Code</span>
         </div>
-        {/* NavLinks */}
         <nav>
           <ul className="flex gap-4 text-md font-medium">
             <li>
@@ -68,9 +124,9 @@ const Register = () => {
         <div className="w-full max-w-4xl bg-white/70 shadow-xl rounded-3xl overflow-hidden flex flex-col md:flex-row backdrop-blur-2xl mx-4 my-8">
           {/* Left - Image */}
           <div className="md:w-1/2 hidden md:flex items-center justify-center bg-gradient-to-br from-blue-200 via-white to-purple-200">
-            <img 
-              src={img} 
-              alt="Register illustration" 
+            <img
+              src={img}
+              alt="Register illustration"
               className="object-cover w-full h-full max-h-[520px]"
               style={{ minHeight: 360 }}
             />
@@ -78,8 +134,15 @@ const Register = () => {
 
           {/* Right - Register Form */}
           <div className="flex-1 flex flex-col justify-center px-8 py-12">
-            <h2 className="text-3xl font-extrabold text-blue-800 text-center mb-4 tracking-tight">Create your <span className="text-indigo-600">TeamCode</span> Account</h2>
-            <form className="flex flex-col gap-5"onSubmit={handleSubmit}>
+            <h2 className="text-3xl font-extrabold text-blue-800 text-center mb-4 tracking-tight">
+              Create your <span className="text-indigo-600">TeamCode</span> Account
+            </h2>
+
+            {/* Feedback messages */}
+            {success && <FeedbackBox message={success} type="success" />}
+            {error && <FeedbackBox message={error} type="error" />}
+
+            <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="fullname" className="block text-sm font-semibold text-blue-800 mb-1">Full Name</label>
                 <input
@@ -88,7 +151,8 @@ const Register = () => {
                   placeholder="Enter your Full Name"
                   className="w-full px-4 py-3 rounded-xl bg-sky-50 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 text-blue-900 font-medium transition"
                   autoComplete="name"
-                  onChange={e=>setFullname(e.target.value)}
+                  value={fullname}
+                  onChange={e => setFullname(e.target.value)}
                 />
               </div>
               <div>
@@ -99,7 +163,8 @@ const Register = () => {
                   placeholder="Enter your Email"
                   className="w-full px-4 py-3 rounded-xl bg-sky-50 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 text-blue-900 font-medium transition"
                   autoComplete="email"
-                  onChange={e=>setEmail(e.target.value)}
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                 />
               </div>
               <div>
@@ -110,7 +175,8 @@ const Register = () => {
                   placeholder="Enter your Password"
                   className="w-full px-4 py-3 rounded-xl bg-sky-50 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 text-blue-900 font-medium transition"
                   autoComplete="new-password"
-                  onChange={e=>setPassword(e.target.value)}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
                 />
               </div>
               <div>
@@ -121,7 +187,8 @@ const Register = () => {
                   placeholder="Enter your Phone Number"
                   className="w-full px-4 py-3 rounded-xl bg-sky-50 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 text-blue-900 font-medium transition"
                   autoComplete="tel"
-                  onChange={e=>setPhoneno(e.target.value)}
+                  value={phoneno}
+                  onChange={e => setPhoneno(e.target.value)}
                 />
               </div>
               <div>
@@ -131,7 +198,8 @@ const Register = () => {
                   type="text"
                   placeholder="e.g. Frontend Developer, Designer"
                   className="w-full px-4 py-3 rounded-xl bg-sky-50 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 text-blue-900 font-medium transition"
-                  onChange={e=>setRole(e.target.value)}
+                  value={role}
+                  onChange={e => setRole(e.target.value)}
                 />
               </div>
               <button

@@ -2,17 +2,42 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
+// Feedback message box component
+const FeedbackBox = ({ message, type }) => (
+  <div
+    className={`
+      flex items-center gap-2 max-w-xs mx-auto my-2 px-4 py-3 rounded-lg shadow-lg font-semibold
+      ${type === 'success'
+        ? 'bg-green-100 text-green-800 border border-green-300'
+        : 'bg-red-100 text-red-800 border border-red-300'}
+      animate-fade-in
+    `}
+    style={{ animation: 'fadeIn 0.3s' }}
+  >
+    {type === 'success' ? (
+      <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+    ) : (
+      <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    )}
+    <span>{message}</span>
+  </div>
+);
+
 const Contact = () => {
   const [fullname, setFullname] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const [status, setStatus] = useState('');
+  const [feedback, setFeedback] = useState({ message: '', type: '' });
 
   const apiKey = 'YOUR_API_KEY_HERE'; // Replace with your actual API key
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus('');
+    setFeedback({ message: '', type: '' });
     try {
       await axios.post(
         'http://localhost:8080/api/contact',
@@ -24,12 +49,13 @@ const Contact = () => {
           },
         }
       );
-      setStatus('Message sent successfully!');
+      setFeedback({ message: 'Message sent successfully! 🎉', type: 'success' });
+      setTimeout(() => setFeedback({ message: '', type: '' }), 2500);
       setFullname('');
       setEmail('');
       setMessage('');
     } catch (error) {
-      setStatus('Failed to send message. Please try again later.');
+      setFeedback({ message: 'Failed to send message. Please try again later.', type: 'error' });
       console.error(error);
     }
   };
@@ -66,6 +92,8 @@ const Contact = () => {
           <div className="flex-1">
             <h2 className="text-2xl font-bold text-blue-800 mb-1">Contact Us</h2>
             <p className="mb-6 text-gray-600">Let’s connect! Fill out the form below and our team will get back to you promptly.</p>
+            {/* Feedback message box */}
+            {feedback.message && <FeedbackBox message={feedback.message} type={feedback.type} />}
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               <input
                 type="text"
@@ -97,7 +125,6 @@ const Contact = () => {
               >
                 Send Message
               </button>
-              {status && <p className="mt-4 text-center font-semibold text-blue-700">{status}</p>}
             </form>
           </div>
           {/* RIGHT: CONTACT INFO */}
@@ -143,4 +170,3 @@ const ContactInfo = ({ icon, label, value, href }) => (
 );
 
 export default Contact;
-
