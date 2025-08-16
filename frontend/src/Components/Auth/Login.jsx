@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import img from '../image/teamcodeloginimg.jpg';
 
@@ -8,6 +8,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
 
   // Email regex for basic validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -39,9 +40,11 @@ const Login = () => {
       );
       setError('');
       setSuccess('Login Successful! 🎉');
-      // Optionally hide message after a delay
-      setTimeout(() => setSuccess(''), 2500);
-      // Optional: redirect after delay here
+      localStorage.setItem("email", email); // Correct localStorage usage
+      setTimeout(() => {
+        setSuccess('');
+        navigate("/profile");
+      }, 2500);
     } catch (err) {
       if (err.response && err.response.data) {
         setSuccess('');
@@ -80,8 +83,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-100 to-blue-300 flex flex-col">
-      {/* HEADER ... unchanged ... */}
-
+      {/* Header */}
       <header className="backdrop-blur-md bg-white/60 shadow-lg py-4 px-6 flex items-center justify-between">
         <div className="text-2xl lg:text-3xl font-extrabold text-blue-700 tracking-tight drop-shadow-md">
           Team<span className="text-indigo-600">Code</span>
@@ -119,13 +121,11 @@ const Login = () => {
               style={{ minHeight: 360 }}
             />
           </div>
-
           {/* Right - Login Form */}
           <div className="flex-1 flex flex-col justify-center px-8 py-12">
             <h2 className="text-3xl font-extrabold text-blue-800 text-center mb-4 tracking-tight">
               Sign In to <span className="text-indigo-600">TeamCode</span>
             </h2>
-
             {/* Show styled messages */}
             {success && <FeedbackBox message={success} type="success" />}
             {error && <FeedbackBox message={error} type="error" />}
@@ -142,7 +142,7 @@ const Login = () => {
                   className="w-full px-4 py-3 rounded-xl bg-sky-50 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 text-blue-900 font-medium transition"
                   autoComplete="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                 />
               </div>
               <div>
@@ -156,7 +156,7 @@ const Login = () => {
                   className="w-full px-4 py-3 rounded-xl bg-sky-50 border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 text-blue-900 font-medium transition"
                   autoComplete="current-password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                 />
               </div>
               <button

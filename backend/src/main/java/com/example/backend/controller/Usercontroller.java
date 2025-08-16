@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.Repository.Userrepo;
 import com.example.backend.dto.Loginrequest;
 import com.example.backend.model.Contact;
 import com.example.backend.model.User;
@@ -8,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin("http://localhost:5173")
+@CrossOrigin("http://localhost:5174")
 @RestController
 @RequestMapping("/api")
 public class Usercontroller {
     @Autowired
     private Userservice userservice;
+    @Autowired
+    private Userrepo userrepo;
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody User user){
         String res=userservice.getRegister(user);
@@ -41,4 +44,14 @@ public class Usercontroller {
             return ResponseEntity.status(401).body("Invalid Login Credientals");
         }
     }
+    @GetMapping("/user/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+        User user = userrepo.findByEmail(email);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
